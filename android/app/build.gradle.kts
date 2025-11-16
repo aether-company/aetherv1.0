@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.aether"
-    compileSdk = 35 // ✅ Explicitly set compileSdkVersion
+    compileSdk = 36 // ✅ Explicitly set compileSdkVersion
     ndkVersion = "27.0.12077973"  // ✅ Fix NDK version mismatch
 
     compileOptions {
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.aether"
-        minSdkVersion(23)  // ✅ Ensure this is 23
+        minSdkVersion(24)  // ✅ Ensure this is 23
         targetSdkVersion(35) // ✅ Explicitly set target SDK
         versionCode = 1
         versionName = "1.0"

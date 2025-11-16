@@ -63,10 +63,12 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#00000000"    # transparent
+  adaptive_icon_foreground: "assets/images/app_icon.png"
 
 
 # The following section is specific to Flutter packages.
@@ -78,16 +80,16 @@ flutter:
   uses-material-design: true
 
   assets:
-   - assets/images/background.jpg
-   - assets/images/jh.png
-   - assets/images/entryj.png
-   - assets/images/journal.png
-   - assets/images/logo.png
-   - assets/images/lily_icon.png
-   - assets/images/google_icon.png
-   - assets/images/em.png
-   - assets/images/lily.png
-   - assets/images/b1.mp4
+  - assets/images/background.jpg
+  - assets/images/jh.png
+  - assets/images/entryj.png
+  - assets/images/journal.png
+  - assets/images/logo.png
+  - assets/images/lily_icon.png
+  - assets/images/google_icon.png
+  - assets/images/em.png
+  - assets/images/lily.png
+  - assets/images/b1.mp4
 
 
   # To add assets to your application, add an assets section, like this:
