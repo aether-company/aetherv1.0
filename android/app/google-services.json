@@ -13,7 +13,20 @@
           "package_name": "com.example.aether"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "384582288929-rfq0v39l4t99mdumilt351llp2gq04ig.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aether",
+            "certificate_hash": "ff8fa150b941fd16984e00435e74c94fa27dc66c"
+          }
+        },
+        {
+          "client_id": "384582288929-9qguvskgnoaoa73mobfr2llio3i7v9gh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDdJLi8KSOUaqryj2YbvTBLLYF-7zBni-w"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "384582288929-9qguvskgnoaoa73mobfr2llio3i7v9gh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "384582288929-c2utlkp1ug7b927unslps2omalthi99d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.aether"
+              }
+            }
+          ]
         }
       }
     }
