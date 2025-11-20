@@ -325,40 +325,35 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           MaterialPageRoute(
             builder:
-                (context) => EmotionLogScreen(
-                  userId: _authService.currentUserId!,
-                ), // Pass actual userId
+                (context) =>
+                    EmotionLogScreen(userId: _authService.currentUserId!),
           ),
         );
 
         if (result == 'completed') {
           setState(() {
-            // Update the tile text to show a new message
             _tileText = "Feel free to log again!";
           });
         }
       },
       child: Container(
-        height: 150,
+        height: 180,
         width: double.infinity,
-        margin: EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 10),
+
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.5),
-              blurRadius: 10,
-              spreadRadius: 1,
-              offset: Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(10), // ✔ slight rounding
+          color: Colors.transparent, // ✔ no background tint
+          boxShadow: [], // ✔ clean, flat modern UI
+          border: null, // ✔ no border
         ),
+
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(10), // ✔ matches parent rounding
           child: Stack(
             fit: StackFit.expand,
             children: [
+              // Background Video
               FutureBuilder(
                 future: _initializeVideoPlayerFuture,
                 builder: (context, snapshot) {
@@ -373,18 +368,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   } else {
-                    return Container(color: Colors.blueGrey.shade200);
+                    return Container(color: Colors.blueGrey.shade300);
                   }
                 },
               ),
+
+              // Tile Text (with COOL font)
               Center(
                 child: Text(
-                  _tileText, // Dynamically change the tile text
-                  style: TextStyle(
-                    fontSize: 24,
+                  _tileText,
+                  textAlign: TextAlign.center,
+
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
+                    fontFamily: 'SpaceGrotesk', // ✔ cooler modern font
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
