@@ -38,7 +38,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       );
 
       await _forumService.createPost(newPost);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post Created!")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Post Created!")));
       Navigator.pop(context);
     }
   }
@@ -49,28 +51,49 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.blue[800]?.withOpacity(0.7),
-        title: Text("Create Post", style: GoogleFonts.poppins(color: Colors.white)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        title: Text(
+          "New Post",
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.check, color: Colors.white),
-            onPressed: _submitPost,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ElevatedButton(
+              onPressed: _submitPost,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.9),
+                foregroundColor: Colors.black,
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Post",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
         ],
       ),
       body: Stack(
         children: [
-          // Gradient Background
+          // Gradient background
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromARGB(255, 3, 93, 105),
-                  Color.fromARGB(255, 5, 68, 97),
-                  Color.fromARGB(255, 5, 28, 61),
+                  Color(0xFF01374E),
+                  Color(0xFF022C43),
+                  Color(0xFF011724),
                 ],
               ),
             ),
@@ -78,36 +101,57 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
           SafeArea(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // "What's on your mind?" text
-                  Text(
-                    "What's on your mind?",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.25),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "What's on your mind?",
+                          style: GoogleFonts.poppins(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        _buildTextField(
+                          controller: _titleController,
+                          hint: "Post title",
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildTextField(
+                          controller: _contentController,
+                          hint: "Write your thoughts...",
+                          maxLines: 10,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 20),
-
-                  // Title field
-                  _buildTextField(
-                    controller: _titleController,
-                    hint: "Enter post title...",
-                    maxLines: 1,
-                  ),
-                  SizedBox(height: 20),
-
-                  // Content field
-                  _buildTextField(
-                    controller: _contentController,
-                    hint: "Enter post content...",
-                    maxLines: 10,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -116,6 +160,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     );
   }
 
+  // Styled input fields
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
@@ -124,15 +169,29 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      style: TextStyle(color: Colors.white),
+      style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.15),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+        fillColor: Colors.white.withOpacity(0.07),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 14,
+          horizontal: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.25),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.5),
+            width: 1.4,
+          ),
         ),
       ),
     );

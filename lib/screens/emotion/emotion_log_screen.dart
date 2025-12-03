@@ -709,7 +709,7 @@ class _EmotionLogScreenState extends State<EmotionLogScreen> {
                             .toList(),
                   ),
                 ),
-              ],
+              ], 
             ),
           ),
         ),
@@ -787,4 +787,4 @@ class _EmotionLogScreenState extends State<EmotionLogScreen> {
       ),
     );
   }
-}
+} 
