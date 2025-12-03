@@ -12,9 +12,9 @@ class JournalDetailScreen extends StatelessWidget {
 
   void _deleteEntry(BuildContext context) async {
     await _journalService.deleteEntry(entry.entryId!);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Entry deleted.")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("Entry deleted.")));
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => JournalHome()),
@@ -27,158 +27,171 @@ class JournalDetailScreen extends StatelessWidget {
   }
 
   final List<Color> stickyNoteColors = [
-    Color(0xFFB3E5FC), // Light Blue 100
-    Color(0xFF81D4FA), // Light Blue 200
-    Color(0xFF4FC3F7), // Light Blue 300
-    Color(0xFF29B6F6), // Light Blue 400
-    Color(0xFFE1F5FE), // Light Blue 50 (very pale)
-    Color(0xFFB2EBF2), // Cyan 100
+    Color(0xFF2D2D2D),
+    Color(0xFF3A3A3A),
+    Color(0xFF4A4A4A),
+    Color(0xFF5A5A5A),
+    Color(0xFF333333),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 41, 182, 175),
-              Color(0xFF0ED2F7),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title Row
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          entry.title.isNotEmpty ? entry.title : "Untitled",
-                          style: GoogleFonts.patrickHand(
-                            fontSize: 28,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+      backgroundColor: Color(0xFF121212),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// HEADER
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      entry.title.isNotEmpty ? entry.title : "Untitled",
+                      style: GoogleFonts.poppins(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.white),
-                        onPressed: () => _deleteEntry(context),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Colors.redAccent.withOpacity(0.3),
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () => _deleteEntry(context),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 18),
+
+              /// CONTENT CARD
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(22),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.grey.shade800, width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
                       ),
                     ],
                   ),
-                ),
-
-                // Big Paper Container
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                    width: MediaQuery.of(context).size.width * 0.92,
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 194, 255, 254),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 1,
-                      ),
-                    ),
-                    child: CustomPaint(
-                      painter: LinedPaperPainter(),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Mood: ${entry.mood}",
-                                  style: GoogleFonts.patrickHand(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  _formatDate(entry.date),
-                                  style: GoogleFonts.patrickHand(
-                                    fontSize: 18,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Text(
-                              entry.content,
-                              style: GoogleFonts.shadowsIntoLight(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            if (entry.notes.isNotEmpty) ...[
+                  child: CustomPaint(
+                    painter: LinedPaperPainterDark(),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// MOOD + DATE
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                               Text(
-                                "Notes:",
-                                style: GoogleFonts.patrickHand(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                "Mood: ${entry.mood}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.tealAccent,
                                 ),
                               ),
-                              SizedBox(height: 10),
-                              Wrap(
-                                spacing: 8.0,
-                                runSpacing: 8.0,
-                                children: entry.notes.asMap().entries.map((e) {
-                                  int index = e.key;
-                                  String note = e.value;
-                                  return Container(
-                                    width: 120,
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: stickyNoteColors[index % stickyNoteColors.length],
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 4,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      note,
-                                      style: GoogleFonts.patrickHand(
-                                        fontSize: 16,
-                                        color: Colors.brown[800],
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
+                              Text(
+                                _formatDate(entry.date),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  color: Colors.white70,
+                                ),
                               ),
                             ],
+                          ),
+                          SizedBox(height: 22),
+
+                          /// BODY CONTENT
+                          Text(
+                            entry.content,
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(0.92),
+                            ),
+                          ),
+
+                          SizedBox(height: 26),
+
+                          /// NOTES
+                          if (entry.notes.isNotEmpty) ...[
+                            Text(
+                              "Notes",
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 14),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children:
+                                  entry.notes.asMap().entries.map((e) {
+                                    int index = e.key;
+                                    String note = e.value;
+                                    return Container(
+                                      padding: EdgeInsets.all(14),
+                                      width: 140,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            stickyNoteColors[index %
+                                                stickyNoteColors.length],
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: Colors.white12,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.4,
+                                            ),
+                                            blurRadius: 5,
+                                            offset: Offset(2, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        note,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -186,15 +199,16 @@ class JournalDetailScreen extends StatelessWidget {
   }
 }
 
-// Lined Paper Painter
-class LinedPaperPainter extends CustomPainter {
+/// DARK LINED PAPER LINES
+class LinedPaperPainterDark extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withOpacity(0.05)
-      ..strokeWidth = 1;
+    final paint =
+        Paint()
+          ..color = Colors.white.withOpacity(0.05)
+          ..strokeWidth = 1;
 
-    for (double y = 20; y < size.height; y += 28) {
+    for (double y = 22; y < size.height; y += 28) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }

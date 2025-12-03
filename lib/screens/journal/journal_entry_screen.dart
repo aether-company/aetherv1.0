@@ -25,6 +25,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   List<String> _notes = [];
   String _selectedMood = 'Neutral';
 
+  bool _isDarkTheme = false; // UI ONLY — does not affect logic
+
   final List<Map<String, String>> moods = [
     {'mood': 'Happy', 'emoji': '😊'},
     {'mood': 'Sad', 'emoji': '😢'},
@@ -45,7 +47,6 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     Color(0xFFFFCCBC),
     Color(0xFFD1C4E9),
   ];
-
 
   @override
   void initState() {
@@ -88,7 +89,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
         await _journalService.updateEntry(entryId, newEntry.toMap());
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Entry Saved!")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Entry Saved!")));
 
       Navigator.pushAndRemoveUntil(
         context,
@@ -107,212 +110,273 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     }
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
+    final Color primaryBG =
+        _isDarkTheme ? Color(0xFF0B1B30) : Color(0xFFE8FAF4);
+    final Color cardColor = _isDarkTheme ? Color(0xFF15283F) : Colors.white;
+    final Color textColor = _isDarkTheme ? Colors.white : Colors.black87;
+    final Color accentColor =
+        _isDarkTheme ? Color(0xFF4FA3FF) : Color(0xFF4FC3F7);
+
     return Scaffold(
-      body: Hero(
-        tag: 'journal-entry',
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromARGB(255, 41, 182, 175),
-                Color(0xFF0ED2F7),
-              ],
-            ),
+      backgroundColor: primaryBG,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text(
+          widget.entry == null ? "New Memory" : "Edit Memory",
+          style: GoogleFonts.poppins(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: textColor,
           ),
-        child: SafeArea(
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.check, color: textColor, size: 28),
+            onPressed: _saveEntry,
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                color: Colors.transparent,
-                child: Row(
+              // 🔵 THEME SWITCH
+              _buildCleanCard(
+                cardColor,
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.entry == null ? "A New Memory" : "Edit Memory",
-                      style: GoogleFonts.sacramento(
-                        fontSize: 40,
+                      "Theme",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.check, color: Colors.white, size: 28),
-                      onPressed: _saveEntry,
+                    Switch(
+                      value: _isDarkTheme,
+                      activeColor: accentColor,
+                      onChanged:
+                          (value) => setState(() => _isDarkTheme = value),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCard(TextField(
-                        controller: _titleController,
-                        style: GoogleFonts.patrickHand(fontSize: 22, color: Colors.black87),
-                        decoration: InputDecoration(
-                          hintText: "Entry Title",
-                          hintStyle: GoogleFonts.patrickHand(color: Colors.black54, fontSize: 20),
-                          border: InputBorder.none,
-                        ),
-                      )),
-                      SizedBox(height: 12),
-                      _buildCard(
-                        Container(
-                          height: 350,
-                        child: TextField(
-                        controller: _contentController,
-                        maxLines: null,
-                        keyboardType: TextInputType.multiline,
-                        style: GoogleFonts.patrickHand(fontSize: 20, color: Colors.black87),
-                        decoration: InputDecoration(
-                          hintText: "Write your thoughts...",
-                          hintStyle: GoogleFonts.patrickHand(color: Colors.black54, fontSize: 20),
-                          border: InputBorder.none,
-                        ),
-                      ))),
-                      SizedBox(height: 16),
-                      Text("How do you feel?", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black54)),
-                      SizedBox(height: 8),
-                      Container(
-                        height: 48,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: moods.length,
-                          itemBuilder: (context, index) {
-                            final mood = moods[index];
-                            final isSelected = _selectedMood == mood['mood'];
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedMood = mood['mood']!;
-                                });
-                              },
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 6),
-                                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? Colors.blueAccent : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text(mood['emoji']!, style: TextStyle(fontSize: 18)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      mood['mood']!,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: isSelected ? Colors.white : Colors.black87,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      _buildCard(
-                        TextField(
-                          controller: _noteController,
-                          style: GoogleFonts.poppins(fontSize: 15, color: Colors.black),
-                          decoration: InputDecoration(
-                            hintText: "Add a note",
-                            border: InputBorder.none,
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: _addNote,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: _notes.asMap().entries.map((entry) {
-                          int index = entry.key;
-                          String note = entry.value;
-                          return Container(
-                            width: 130,
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: stickyNoteColors[index % stickyNoteColors.length],
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: Offset(2, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  note,
-                                  style: GoogleFonts.patrickHand(
-                                      fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
-                                ),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: GestureDetector(
-                                    onTap: () => setState(() => _notes.remove(note)),
-                                    child: Icon(Icons.close, size: 16, color: Colors.black54),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
+
+              SizedBox(height: 18),
+
+              // TITLE FIELD
+              _buildCleanCard(
+                cardColor,
+                TextField(
+                  controller: _titleController,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: "Entry title...",
+                    hintStyle: GoogleFonts.poppins(
+                      color: textColor.withOpacity(0.4),
+                    ),
+                    border: InputBorder.none,
                   ),
                 ),
+              ),
+
+              SizedBox(height: 16),
+
+              // CONTENT FIELD
+              _buildCleanCard(
+                cardColor,
+                SizedBox(
+                  height: 320,
+                  child: TextField(
+                    controller: _contentController,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    style: GoogleFonts.poppins(fontSize: 16, color: textColor),
+                    decoration: InputDecoration(
+                      hintText: "Write your thoughts...",
+                      hintStyle: GoogleFonts.poppins(
+                        color: textColor.withOpacity(0.45),
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 18),
+              Text(
+                "Mood",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // MOOD SELECTOR
+              SizedBox(
+                height: 48,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: moods.length,
+                  itemBuilder: (context, index) {
+                    final mood = moods[index];
+                    final isSelected = _selectedMood == mood['mood'];
+                    return GestureDetector(
+                      onTap:
+                          () => setState(() => _selectedMood = mood['mood']!),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 6),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          color: isSelected ? accentColor : cardColor,
+                          border: Border.all(
+                            color:
+                                isSelected
+                                    ? accentColor
+                                    : textColor.withOpacity(0.15),
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              mood['emoji']!,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              mood['mood']!,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: isSelected ? Colors.white : textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // NOTE FIELD
+              _buildCleanCard(
+                cardColor,
+                TextField(
+                  controller: _noteController,
+                  style: GoogleFonts.poppins(fontSize: 15, color: textColor),
+                  decoration: InputDecoration(
+                    hintText: "Add note...",
+                    hintStyle: GoogleFonts.poppins(
+                      color: textColor.withOpacity(0.4),
+                    ),
+                    border: InputBorder.none,
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.add, color: textColor),
+                      onPressed: _addNote,
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 12),
+
+              // NOTES DISPLAY
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children:
+                    _notes.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      String note = entry.value;
+                      return Container(
+                        width: 140,
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: stickyNoteColors[index %
+                                  stickyNoteColors.length]
+                              .withOpacity(_isDarkTheme ? 0.85 : 1),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 8,
+                              offset: Offset(2, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              note,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: GestureDetector(
+                                onTap:
+                                    () => setState(() => _notes.remove(note)),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: textColor.withOpacity(0.6),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
               ),
             ],
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildCard(Widget child) {
-  return Container(
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black12,
-          blurRadius: 8,
-          offset: Offset(2, 2),
-        ),
-      ],
-    ),
-    child: child,
-  );
-}
+  Widget _buildCleanCard(Color cardColor, Widget child) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      margin: EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 }

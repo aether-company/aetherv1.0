@@ -12,7 +12,9 @@ class JournalHome extends StatefulWidget {
   @override
   _JournalHomeState createState() => _JournalHomeState();
 }
-class _JournalHomeState extends State<JournalHome> with SingleTickerProviderStateMixin {
+
+class _JournalHomeState extends State<JournalHome>
+    with SingleTickerProviderStateMixin {
   final JournalService _journalService = JournalService();
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -25,9 +27,10 @@ class _JournalHomeState extends State<JournalHome> with SingleTickerProviderStat
       duration: Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -73,16 +76,11 @@ class _JournalHomeState extends State<JournalHome> with SingleTickerProviderStat
 
     if (user == null) {
       return Scaffold(
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/jh.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-            Center(child: Text("Please log in to view entries.", style: TextStyle(fontSize: 18, color: Colors.black))),
-          ],
+        body: Center(
+          child: Text(
+            "Please log in to view entries.",
+            style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
+          ),
         ),
       );
     }
@@ -90,135 +88,205 @@ class _JournalHomeState extends State<JournalHome> with SingleTickerProviderStat
     String userId = user.uid;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.teal, Colors.lightBlue],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 60),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10),
+
+              /// TITLE
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: Text(
                   "Memory Log",
-                  style: GoogleFonts.sacramento(fontSize: 60, color: Colors.white),
+                  style: GoogleFonts.sacramento(
+                    fontSize: 68,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: DefaultTextStyle(
-          style: GoogleFonts.sacramento(fontSize: 27, color: Colors.white, fontWeight: FontWeight.bold),
-          child: AnimatedTextKit(
-            animatedTexts: [
-              TypewriterAnimatedText(
-                'Every moment matters...',
-                speed: Duration(milliseconds: 150),
+
+              Padding(
+                padding: const EdgeInsets.only(left: 26, bottom: 12),
+                child: DefaultTextStyle(
+                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
+                  child: AnimatedTextKit(
+                    totalRepeatCount: 1,
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        'Write your story.',
+                        speed: Duration(milliseconds: 120),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-            totalRepeatCount: 1,
-            pause: const Duration(milliseconds: 1000),
-          ),
-        ),
-      ),
-    ),
-            Expanded(
-              child: StreamBuilder<List<JournalEntry>>(
-                stream: _journalService.getUserEntries(userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
 
-                  if (snapshot.hasError) {
-                    return Center(child: Text("Error loading entries.", style: GoogleFonts.poppins(color: Colors.black)));
-                  }
+              const SizedBox(height: 10),
 
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text("No entries yet!", style: GoogleFonts.poppins(fontSize: 18, color: Colors.white)));
-                  }
+              /// LIST CONTENT
+              Expanded(
+                child: StreamBuilder<List<JournalEntry>>(
+                  stream: _journalService.getUserEntries(userId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    }
 
-                  final entries = snapshot.data!;
-
-                  return ListView.builder(
-                    itemCount: entries.length,
-                    itemBuilder: (context, index) {
-                      final entry = entries[index];
-                      return AnimatedOpacity(
-                        duration: const Duration(milliseconds: 800),
-                        opacity: 1.0,
-                        child: Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                          color: const Color(0xFFA8E6CF),
-                          child: ListTile(
-                            leading: Text(
-                              getMoodIcon(entry.mood),
-                              style: const TextStyle(fontSize: 28),
-                            ),
-                            title: Text(
-                              entry.title.isNotEmpty ? entry.title : "Untitled",
-                              style: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              "Mood: ${entry.mood}\n${formatDate(entry.date)}",
-                              style: GoogleFonts.poppins(color: Colors.black),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  transitionDuration: const Duration(milliseconds: 600),
-                                  pageBuilder: (context, animation, secondaryAnimation) => JournalDetailScreen(entry: entry),
-                                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                    return FadeTransition(opacity: animation, child: child);
-                                  },
-                                ),
-                              );
-                            },
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          "Error loading entries.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.white,
                           ),
                         ),
                       );
-                    },
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "Start writing your first memory!",
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }
+
+                    final entries = snapshot.data!;
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      itemCount: entries.length,
+                      itemBuilder: (context, index) {
+                        final entry = entries[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                transitionDuration: Duration(milliseconds: 400),
+                                pageBuilder:
+                                    (_, anim, __) => FadeTransition(
+                                      opacity: anim,
+                                      child: JournalDetailScreen(entry: entry),
+                                    ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 18),
+                            padding: EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFA8E6CF),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.teal.shade900,
+                                width: 1.4,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  getMoodIcon(entry.mood),
+                                  style: TextStyle(fontSize: 36),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  entry.title.isNotEmpty
+                                      ? entry.title
+                                      : "Untitled",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "Mood: ${entry.mood} • ${formatDate(entry.date)}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder:
+            (context, child) => Transform.scale(
+              scale: _scaleAnimation.value,
+              child: FloatingActionButton.extended(
+                backgroundColor: Color(0xFF00BFA6),
+                icon: Icon(Icons.edit, size: 26),
+                label: Text(
+                  "New Entry",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
+                elevation: 8,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: Duration(milliseconds: 400),
+                      pageBuilder:
+                          (_, anim, __) => FadeTransition(
+                            opacity: anim,
+                            child: JournalEntryScreen(),
+                          ),
+                    ),
                   );
                 },
               ),
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: FloatingActionButton(
-              backgroundColor: const Color(0xFF00BFA6),
-              child: const Icon(Icons.edit, color: Colors.white, size: 30),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 600),
-                    pageBuilder: (context, animation, secondaryAnimation) => JournalEntryScreen(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                  ),
-                );
-              },
-            ),
-          );
-        },
       ),
     );
   }
