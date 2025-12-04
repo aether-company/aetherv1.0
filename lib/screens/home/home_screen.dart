@@ -1,6 +1,5 @@
 import 'package:animate_gradient/animate_gradient.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth_service.dart';
 import '../auth/login_screen.dart';
 import '../forum/forum_home.dart';
@@ -16,6 +15,7 @@ import '../music/music_player_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:ui';
 import 'package:video_player/video_player.dart';
+import '../activities/activities_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -211,7 +211,12 @@ class _HomeScreenState extends State<HomeScreen> {
               "Activity Tracker",
               onTap: () {
                 Navigator.pop(context); // Close the drawer
-                // Add navigation later for Activity Tracker
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ActivitiesScreen(),
+                  ),
+                );
               },
             ),
           ],

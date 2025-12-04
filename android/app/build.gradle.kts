@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.aether"
-        minSdkVersion(24)  // ✅ Ensure this is 23
+        minSdkVersion(26)  // ✅ Ensure this is 23
         targetSdkVersion(35) // ✅ Explicitly set target SDK
         versionCode = 1
         versionName = "1.0"
